@@ -22,7 +22,7 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                withDockerRegistry([credentialsId: 'dockerhub-creds', url: '']) {
+                withDockerRegistry([credentialsId: 'nuclearcode070/******', url: '']) {
                     script {
                         docker.image("${IMAGE_NAME}:latest").push()
                     }
