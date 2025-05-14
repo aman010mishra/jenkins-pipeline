@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'yourdockerhubusername/simple-node-app'
+        IMAGE_NAME = 'nuclearcode070/simple-node-app'
     }
 
     stages {
@@ -22,7 +22,7 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                withDockerRegistry([credentialsId: 'nuclearcode070/******', url: '']) {
+                withDockerRegistry([credentialsId: 'nuclearcode070', url: '']) {
                     script {
                         docker.image("${IMAGE_NAME}:latest").push()
                     }
@@ -32,7 +32,7 @@ pipeline {
 
         stage('Run App in Container') {
             steps {
-                sh 'docker run -d -p 3000:3000 --name simple-node-app yourdockerhubusername/simple-node-app:latest'
+                sh 'docker run -d -p 3000:3000 --name simple-node-app nuclearcode070/simple-node-app:latest'
             }
         }
     }
