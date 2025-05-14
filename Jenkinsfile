@@ -5,13 +5,10 @@ pipeline {
         IMAGE_NAME = 'nuclearcode070/simple-node-app'
     }
 
-    stages {
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/aman010mishra/jenkins-pipeline.git'
-            }
-        }
-
+    
+        
+        stages {
+                                      
         stage('Build Docker Image') {
             steps {
                 script {
@@ -35,5 +32,5 @@ pipeline {
                 sh 'docker run -d -p 3000:3000 --name simple-node-app nuclearcode070/simple-node-app:latest'
             }
         }
-    }
+        }
 }
