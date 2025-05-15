@@ -2,35 +2,50 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'nuclearcode070/simple-node-app'
+        IMAGE_NAME = 'your-dockerhub-username/your-image-name'
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
-    
-        
-        stages {
-                                      
-        stage('Build Docker Image') {
+    stages {
+        stage('Clone') {
+            steps {
+                git 'https://github.com/aman010mishra/jenkins-pipeline.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'echo Building the application...'
+                // Add project build steps here
+            }
+        }
+
+        stage('Docker Build') {
             steps {
                 script {
-                    docker.build("${IMAGE_NAME}:latest")
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Docker Push') {
             steps {
-                withDockerRegistry([credentialsId: 'b4839ef8-8fe1-4a91-9cf9-c792f251e7fe', url: '']) {
-                    script {
-                        docker.image("${IMAGE_NAME}:latest").push()
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh """
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                        """
                     }
                 }
             }
         }
+    }
 
-        stage('Run App in Container') {
-            steps {
-                sh 'docker run -d -p 3000:3000 --name simple-node-app nuclearcode070/simple-node-app:latest'
-            }
+    post {
+        always {
+            echo 'Cleaning up...'
+            sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
         }
-        }
+    }
 }
